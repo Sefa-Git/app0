@@ -1,51 +1,71 @@
 import { StatusBar } from 'expo-status-bar';
 import React,{ useState} from 'react';
-import { StyleSheet, Text, View, Button, Alert, TextInput } from 'react-native';
+import { StyleSheet, View, FlatList, Button} from 'react-native';
+
+import GoalItem from './components/GoalItem';
+import GoalInput from './components/GoalInput';
 
 export default function App() {
 
-  const [enteredGoalText, setEnteredGoalText] = useState('');
+  const[modalIsVisible,setModalVisible] = useState(false);
   const [courseGoals, setCourseGoals] = useState ([]);
-
-  function goalInputHandler(enteredText){
-    setEnteredGoalText(enteredText);
-    
+  
+  function startAddGoalHandler(){
+    setModalVisible(true);
   }
-  function addGoalHandler(){
+  function endAddGoalHandler(){
+    setModalVisible(false);
+  }
+  function addGoalHandler(enteredGoalText){
     setCourseGoals( (currentCourseGoals) =>[
       ...currentCourseGoals,
-      enteredGoalText,
+      {text: enteredGoalText, id: Math.random().toString()},
     ]);
   }
-  
+
+  function deleteGoalHandler(id){
+  setCourseGoals(currentCourseGoals =>{
+    return currentCourseGoals.filter((goal) => goal.id !== id);
+  });
+  }  
+
   return (
     <View style={styles.container1}>
-      <View style={styles.inputContainer}>
-       
-        <TextInput
-          style={styles.textinput}
-          placeholder=' this holds the place' 
-          onChange={goalInputHandler}/>
-
-        <Button title=' Le"Button' onPress={addGoalHandler} />      
-      </View>
-        {courseGoals.map((goal) => console.log(courseGoals[0]))}  
+      <Button title='Add New Goal' color="#541593" onPress={startAddGoalHandler}/>
+      <GoalInput 
+      onAddGoal={addGoalHandler} 
+      visible={modalIsVisible} 
+      onCancel={endAddGoalHandler}
+      />
     
       <View style={styles.goalContainer}>
+        <FlatList 
+          data={courseGoals}
+          renderItem={(itemData) =>{
+            return(
+            <GoalItem
+               text={itemData.item.text} 
+               id={itemData.item.id}
+               onDeleteItem={deleteGoalHandler}
+            />
+            );
+          }}
+          
+          keyExtractor={(item,index) =>{
+            return item.id;
+          }}
+          alwaysBounceVertical={false}/>
+          
         
       </View>
+      
     </View>
   
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  
 
   dummy: {
     backgroundColor: '#66ccff',
@@ -58,9 +78,9 @@ const styles = StyleSheet.create({
   },
   
   container1: {    
-    paddingTop:50,
+    paddingTop:60,
     paddingHorizontal:16,
-    backgroundColor: '#fff',        
+    backgroundColor: '#270475',        
     flex:1,
     
   },
@@ -86,4 +106,11 @@ const styles = StyleSheet.create({
     flex:4,
     marginVertical:10,
   },
+  customItem:{
+    margin: 5,
+    borderRadius: 6,
+    padding: 15,
+    backgroundColor: 'blue',
+    color:'white',
+  }
 });
