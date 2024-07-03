@@ -25,6 +25,7 @@ export default function App() {
 
   function deleteGoalHandler(id){
   setCourseGoals(currentCourseGoals =>{
+    consol.log('works')
     return currentCourseGoals.filter((goal) => goal.id !== id);
   });
   }  
